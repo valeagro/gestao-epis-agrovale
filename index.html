@@ -101,8 +101,8 @@
         .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
         .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: var(--danger-hover); }
-        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--danger); }
-        .btn-outline:hover { background-color: rgba(239, 68, 68, 0.1); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: #4CAF50; }
+        .btn-outline:hover { background-color: rgba(76, 175, 80, 0.1); }
         .btn-pdf { background-color: var(--pdf); }
         .btn-pdf:hover { background-color: var(--pdf-hover); }
         .btn-wpp { background-color: var(--whatsapp); }
@@ -118,6 +118,11 @@
         .history-table tr:last-child td { border-bottom: none; }
         .history-table tbody tr:hover { background-color: #273343; }
         .empty-state { text-align: center; padding: 30px 10px; color: var(--text-muted); font-size: 14px; }
+        
+        /* Layout Input Novo EPI */
+        .add-epi-container { display: flex; gap: 10px; }
+        .add-epi-container input { flex: 1; }
+        .add-epi-container button { width: auto; margin-bottom: 0; padding: 0 20px; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -169,19 +174,16 @@
                     <div class="form-group">
                         <label>Selecione os Equipamentos</label>
                         <div class="epi-grid" id="listaEPIs">
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Calça hidrorrepelente"><div class="checkbox-custom"></div> <span>Calça hidrorrepelente</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Jaleco hidrorrepelente"><div class="checkbox-custom"></div> <span>Jaleco hidrorrepelente</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Avental impermeável (PVC)"><div class="checkbox-custom"></div> <span>Avental impermeável</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Botas de borracha/PVC"><div class="checkbox-custom"></div> <span>Botas de borracha/PVC</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Luvas nitrílica/neoprene"><div class="checkbox-custom"></div> <span>Luvas nitrílica/neoprene</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Respirador com filtro"><div class="checkbox-custom"></div> <span>Respirador c/ filtro</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Viseira facial protetora"><div class="checkbox-custom"></div> <span>Viseira facial protetora</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Boné ou touca árabe"><div class="checkbox-custom"></div> <span>Boné ou touca árabe</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Luva MAPA"><div class="checkbox-custom"></div> <span>Luva MAPA</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Máscara descartável"><div class="checkbox-custom"></div> <span>Máscara descartável</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Calça Jeans"><div class="checkbox-custom"></div> <span>Calça Jeans</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Camisa manga longa/curta"><div class="checkbox-custom"></div> <span>Camisa</span></label>
-                            <label class="epi-card"><input type="checkbox" name="epi" value="Bota de Couro"><div class="checkbox-custom"></div> <span>Bota de Couro</span></label>
+                            <!-- Gerado dinamicamente via JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Adicionar Novo EPI -->
+                    <div class="form-group">
+                        <label>Adicionar Novo EPI (Se não estiver na lista)</label>
+                        <div class="add-epi-container">
+                            <input type="text" id="novoEpiNome" placeholder="Nome do equipamento...">
+                            <button type="button" id="btnAdicionarEpi" class="btn btn-outline">+ Adicionar</button>
                         </div>
                     </div>
 
@@ -195,20 +197,7 @@
                 <div class="form-group row-group">
                     <input type="number" id="filtroMatricula" placeholder="🔍 Matrícula...">
                     <select id="filtroEquipamento">
-                        <option value="">Todos os EPIs...</option>
-                        <option value="Calça hidrorrepelente">Calça hidrorrepelente</option>
-                        <option value="Jaleco hidrorrepelente">Jaleco hidrorrepelente</option>
-                        <option value="Avental impermeável (PVC)">Avental impermeável</option>
-                        <option value="Botas de borracha/PVC">Botas de borracha/PVC</option>
-                        <option value="Luvas nitrílica/neoprene">Luvas nitrílica/neoprene</option>
-                        <option value="Respirador com filtro">Respirador c/ filtro</option>
-                        <option value="Viseira facial protetora">Viseira facial protetora</option>
-                        <option value="Boné ou touca árabe">Boné ou touca árabe</option>
-                        <option value="Luva MAPA">Luva MAPA</option>
-                        <option value="Máscara descartável">Máscara descartável</option>
-                        <option value="Calça Jeans">Calça Jeans</option>
-                        <option value="Camisa manga longa/curta">Camisa</option>
-                        <option value="Bota de Couro">Bota de Couro</option>
+                        <!-- Gerado dinamicamente via JS -->
                     </select>
                 </div>
 
@@ -232,7 +221,7 @@
                 </div>
                 
                 <hr style="border: 1px solid var(--border); margin-bottom: 20px;">
-                <button id="limparHistorico" class="btn btn-outline">Limpar Todo o Histórico</button>
+                <button id="limparHistorico" class="btn btn-outline" style="color: var(--danger); border-color: var(--border);">Limpar Todo o Histórico</button>
             </section>
 
             <!-- ABA 3: EQUIPA -->
@@ -265,6 +254,8 @@
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.visibility = 'hidden', 500);
             }, 1500); 
+            renderizarEPIs();
+            renderizarFiltroEPIs();
         });
 
         function openTab(tabId, element) {
@@ -288,6 +279,15 @@
             "95882": { nome: "DIEGO RAUL ANTUNES OLIVEIRA", turma: "8" }
         };
 
+        // --- GESTÃO DE EPIs DINÂMICOS ---
+        const epiPadrao = [
+            "Calça hidrorrepelente", "Jaleco hidrorrepelente", "Avental impermeável (PVC)",
+            "Botas de borracha/PVC", "Luvas nitrílica/neoprene", "Respirador com filtro",
+            "Viseira facial protetora", "Boné ou touca árabe", "Luva MAPA",
+            "Máscara descartável", "Calça Jeans", "Camisa manga longa/curta", "Bota de Couro"
+        ];
+        
+        let episAdicionados = JSON.parse(localStorage.getItem('episAdicionadosAgrovale')) || [];
         let colaboradores = JSON.parse(localStorage.getItem('colaboradoresAgrovale')) || baseInicialColaboradores;
         let historicoEntregas = JSON.parse(localStorage.getItem('entregasEpiAgrovale')) || [];
         let entregasFiltradasAtuais = []; 
@@ -295,6 +295,55 @@
         if (!localStorage.getItem('colaboradoresAgrovale')) {
             localStorage.setItem('colaboradoresAgrovale', JSON.stringify(colaboradores));
         }
+
+        function obterTodosEPIs() {
+            return [...epiPadrao, ...episAdicionados];
+        }
+
+        function renderizarEPIs() {
+            const container = document.getElementById('listaEPIs');
+            container.innerHTML = '';
+            
+            obterTodosEPIs().forEach(epi => {
+                container.innerHTML += `
+                    <label class="epi-card">
+                        <input type="checkbox" name="epi" value="${epi}">
+                        <div class="checkbox-custom"></div> <span>${epi}</span>
+                    </label>
+                `;
+            });
+
+            document.querySelectorAll('input[name="epi"]').forEach(cb => {
+                cb.addEventListener('change', verificarHistoricoMultiplo);
+            });
+        }
+
+        function renderizarFiltroEPIs() {
+            const select = document.getElementById('filtroEquipamento');
+            select.innerHTML = '<option value="">Todos os EPIs...</option>';
+            obterTodosEPIs().forEach(epi => {
+                select.innerHTML += `<option value="${epi}">${epi}</option>`;
+            });
+        }
+
+        // --- ADICIONAR NOVO EPI ---
+        document.getElementById('btnAdicionarEpi').addEventListener('click', function() {
+            const novoEpi = document.getElementById('novoEpiNome').value.trim();
+            if (!novoEpi) return alert("Digite o nome do EPI antes de adicionar.");
+            
+            const todos = obterTodosEPIs();
+            if (todos.some(e => e.toLowerCase() === novoEpi.toLowerCase())) {
+                return alert("Este EPI já se encontra na lista.");
+            }
+            
+            episAdicionados.push(novoEpi);
+            localStorage.setItem('episAdicionadosAgrovale', JSON.stringify(episAdicionados));
+            
+            document.getElementById('novoEpiNome').value = '';
+            renderizarEPIs();
+            renderizarFiltroEPIs();
+            alert(`✅ Equipamento "${novoEpi}" adicionado com sucesso!`);
+        });
 
         function obterDataUltimoPedido(matricula, epi, timestampAtual) {
             const anteriores = historicoEntregas.filter(e => 
@@ -309,7 +358,6 @@
         const matriculaInput = document.getElementById('matricula');
         const nomeInput = document.getElementById('nome');
         const warningBox = document.getElementById('warningBox');
-        const checkboxesEPI = document.querySelectorAll('input[name="epi"]');
 
         function validarMatriculaETurma() {
             const mat = matriculaInput.value;
@@ -347,8 +395,6 @@
             validarMatriculaETurma();
         });
 
-        checkboxesEPI.forEach(cb => cb.addEventListener('change', verificarHistoricoMultiplo));
-
         function verificarHistoricoMultiplo() {
             warningBox.innerHTML = '';
             warningBox.style.display = 'none';
@@ -357,12 +403,10 @@
             if (!validarMatriculaETurma()) return;
 
             let avisos = [];
-            checkboxesEPI.forEach(cb => {
-                if (cb.checked) {
-                    const dataUltimo = obterDataUltimoPedido(mat, cb.value, new Date().toISOString());
-                    if (dataUltimo !== "Primeira vez") {
-                        avisos.push(`• <strong>${cb.value}</strong> retirado em: ${dataUltimo}`);
-                    }
+            document.querySelectorAll('input[name="epi"]:checked').forEach(cb => {
+                const dataUltimo = obterDataUltimoPedido(mat, cb.value, new Date().toISOString());
+                if (dataUltimo !== "Primeira vez") {
+                    avisos.push(`• <strong>${cb.value}</strong> retirado em: ${dataUltimo}`);
                 }
             });
 
@@ -385,7 +429,7 @@
             }
 
             let episSelecionados = [];
-            checkboxesEPI.forEach(cb => { if (cb.checked) episSelecionados.push(cb.value); });
+            document.querySelectorAll('input[name="epi"]:checked').forEach(cb => { episSelecionados.push(cb.value); });
             if (episSelecionados.length === 0) return alert("Selecione pelo menos um EPI.");
 
             const dataAtual = new Date();
@@ -406,7 +450,9 @@
 
             localStorage.setItem('entregasEpiAgrovale', JSON.stringify(historicoEntregas));
             alert("✅ Entrega registada com sucesso!");
+            
             this.reset();
+            document.querySelectorAll('input[name="epi"]').forEach(cb => cb.checked = false); // Limpa as caixas de seleção
             warningBox.style.display = 'none';
             nomeInput.value = '';
             atualizarTabela();
