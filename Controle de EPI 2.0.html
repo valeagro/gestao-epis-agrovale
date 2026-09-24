@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de EPIs Agrovale</title>
+    
+    <!-- Ícone da Aplicação (Favicon e Apple Touch Icon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            var(--primary): #4CAF50; 
+            --primary-light: rgba(76, 175, 80, 0.15); 
+            --primary-hover: #45a049;
+            --text-main: #e5e7eb; 
+            --text-muted: #9ca3af; 
+            --bg-body: #111827; 
+            --bg-card: #1f2937; 
+            --border: #374151; 
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --warning-bg: #422006; 
+            --warning-text: #fde68a; 
+            --input-bg: #374151; 
+            --whatsapp: #25D366;
+            --whatsapp-hover: #1da851;
+            --pdf: #e11d48;
+            --pdf-hover: #be123c;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+        
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-body); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .splash-icon svg { width: 80px; height: 80px; fill: #4CAF50; margin-bottom: 20px; }
+        
+        #splash-screen h1 {
+            color: #ffffff; font-size: 26px; font-weight: 700; margin-bottom: 30px; letter-spacing: 0.5px;
+        }
+
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid var(--border);
+            border-top-color: #4CAF50; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- APP CONTAINER --- */
+        .app-container {
+            background-color: var(--bg-card); width: 100%; max-width: 700px;
+            border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
+            display: flex; flex-direction: column; height: fit-content; max-height: 95vh;
+        }
+
+        .header { background-color: #4CAF50; color: #ffffff; padding: 20px 20px 0 20px; text-align: center; }
+        .header h1 { font-size: 20px; margin-bottom: 20px; font-weight: 600; }
+        
+        .tabs { display: flex; gap: 5px; }
+        .tab-btn {
+            flex: 1; background: rgba(0,0,0,0.2); border: none; color: #ffffff;
+            padding: 12px 10px; font-size: 14px; font-weight: 500; cursor: pointer;
+            border-radius: 8px 8px 0 0; transition: 0.3s; opacity: 0.7;
+        }
+        .tab-btn.active { background: var(--bg-card); color: #ffffff; opacity: 1; font-weight: 600; }
+
+        .content-area { padding: 24px; overflow-y: auto; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-group { margin-bottom: 20px; }
+        .row-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .row-group > * { flex: 1; min-width: 150px; }
+
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-main); }
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+            font-size: 15px; background-color: var(--input-bg); color: var(--text-main);
+        }
+        input::placeholder { color: #6b7280; }
+        input:focus, select:focus { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); }
+        input[readonly] { background-color: #1f2937; color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border); }
+
+        .epi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; max-height: 260px; overflow-y: auto; padding-right: 5px; }
+        .epi-grid::-webkit-scrollbar { width: 6px; }
+        .epi-grid::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .epi-card { display: flex; align-items: center; padding: 12px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; background: var(--bg-card); font-size: 14px; }
+        .epi-card:hover { border-color: #4CAF50; background-color: #273343; }
+        .epi-card input[type="checkbox"] { display: none; }
+        .checkbox-custom { width: 20px; height: 20px; border: 2px solid var(--text-muted); border-radius: 6px; margin-right: 12px; display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); flex-shrink: 0; }
+        .epi-card input[type="checkbox"]:checked + .checkbox-custom { background-color: #4CAF50; border-color: #4CAF50; }
+        .epi-card input[type="checkbox"]:checked + .checkbox-custom::after { content: "✓"; color: #ffffff; font-size: 14px; font-weight: bold; }
+        .epi-card:has(input:checked) { background-color: var(--primary-light); border-color: #4CAF50; color: #4CAF50; font-weight: 600; }
+
+        .warning-box { display: none; background-color: var(--warning-bg); color: var(--warning-text); padding: 16px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; border-left: 4px solid #f59e0b; line-height: 1.6; }
+
+        .btn { width: 100%; padding: 14px; color: #ffffff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .btn-primary { background-color: #4CAF50; }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--danger); }
+        .btn-outline:hover { background-color: rgba(239, 68, 68, 0.1); }
+        .btn-pdf { background-color: var(--pdf); }
+        .btn-pdf:hover { background-color: var(--pdf-hover); }
+        .btn-wpp { background-color: var(--whatsapp); }
+        .btn-wpp:hover { background-color: var(--whatsapp-hover); }
+        
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-group > * { flex: 1; min-width: 140px; }
+
+        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .history-table th { background-color: #111827; color: var(--text-muted); font-weight: 600; text-align: left; padding: 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .history-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        .history-table tr:last-child td { border-bottom: none; }
+        .history-table tbody tr:hover { background-color: #273343; }
+        .empty-state { text-align: center; padding: 30px 10px; color: var(--text-muted); font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <!-- ECRÃ INICIAL (SPLASH SCREEN) -->
+    <div id="splash-screen">
+        <div class="splash-icon">
+            <!-- Ícone de Escudo SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+            </svg>
+        </div>
+        <h1>Gestão de EPIs Agrovale</h1>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- APLICAÇÃO -->
+    <div class="app-container">
+        <header class="header">
+            <h1>Gestão de EPIs</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('tab-entrega', this)">Nova Entrega</button>
+                <button class="tab-btn" onclick="openTab('tab-historico', this)">Histórico</button>
+                <button class="tab-btn" onclick="openTab('tab-colab', this)">Equipa</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            
+            <!-- ABA 1: NOVA ENTREGA -->
+            <section id="tab-entrega" class="tab-content active">
+                <form id="epiForm">
+                    <div class="form-group">
+                        <label for="lider">Líder Responsável</label>
+                        <select id="lider" required>
+                            <option value="">Selecione o Líder...</option>
+                            <option value="68592">Marcos Antônio (Mat: 68592 - Turma 8)</option>
+                            <option value="66680">Lázaro Edivânio (Mat: 66680 - Turma 9)</option>
+                            <option value="68999">Diogo Berg (Mat: 68999 - Turma 89)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="matricula">Matrícula do Colaborador</label>
+                        <input type="number" id="matricula" placeholder="Ex: 93482" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="nome" placeholder="Nome preenchido automaticamente" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Selecione os Equipamentos</label>
+                        <div class="epi-grid" id="listaEPIs">
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Calça hidrorrepelente"><div class="checkbox-custom"></div> <span>Calça hidrorrepelente</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Jaleco hidrorrepelente"><div class="checkbox-custom"></div> <span>Jaleco hidrorrepelente</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Avental impermeável (PVC)"><div class="checkbox-custom"></div> <span>Avental impermeável</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Botas de borracha/PVC"><div class="checkbox-custom"></div> <span>Botas de borracha/PVC</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Luvas nitrílica/neoprene"><div class="checkbox-custom"></div> <span>Luvas nitrílica/neoprene</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Respirador com filtro"><div class="checkbox-custom"></div> <span>Respirador c/ filtro</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Viseira facial protetora"><div class="checkbox-custom"></div> <span>Viseira facial protetora</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Boné ou touca árabe"><div class="checkbox-custom"></div> <span>Boné ou touca árabe</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Luva MAPA"><div class="checkbox-custom"></div> <span>Luva MAPA</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Máscara descartável"><div class="checkbox-custom"></div> <span>Máscara descartável</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Calça Jeans"><div class="checkbox-custom"></div> <span>Calça Jeans</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Camisa manga longa/curta"><div class="checkbox-custom"></div> <span>Camisa</span></label>
+                            <label class="epi-card"><input type="checkbox" name="epi" value="Bota de Couro"><div class="checkbox-custom"></div> <span>Bota de Couro</span></label>
+                        </div>
+                    </div>
+
+                    <div class="warning-box" id="warningBox"></div>
+                    <button type="submit" class="btn btn-primary">✓ Confirmar Entrega</button>
+                </form>
+            </section>
+
+            <!-- ABA 2: HISTÓRICO E EXPORTAÇÃO -->
+            <section id="tab-historico" class="tab-content">
+                <div class="form-group row-group">
+                    <input type="number" id="filtroMatricula" placeholder="🔍 Matrícula...">
+                    <select id="filtroEquipamento">
+                        <option value="">Todos os EPIs...</option>
+                        <option value="Calça hidrorrepelente">Calça hidrorrepelente</option>
+                        <option value="Jaleco hidrorrepelente">Jaleco hidrorrepelente</option>
+                        <option value="Avental impermeável (PVC)">Avental impermeável</option>
+                        <option value="Botas de borracha/PVC">Botas de borracha/PVC</option>
+                        <option value="Luvas nitrílica/neoprene">Luvas nitrílica/neoprene</option>
+                        <option value="Respirador com filtro">Respirador c/ filtro</option>
+                        <option value="Viseira facial protetora">Viseira facial protetora</option>
+                        <option value="Boné ou touca árabe">Boné ou touca árabe</option>
+                        <option value="Luva MAPA">Luva MAPA</option>
+                        <option value="Máscara descartável">Máscara descartável</option>
+                        <option value="Calça Jeans">Calça Jeans</option>
+                        <option value="Camisa manga longa/curta">Camisa</option>
+                        <option value="Bota de Couro">Bota de Couro</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Colaborador</th>
+                                <th>Equipamento</th>
+                                <th>Pedido Anterior</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaHistorico"></tbody>
+                    </table>
+                </div>
+
+                <div class="btn-group" style="margin-bottom: 25px;">
+                    <button onclick="exportarPDF()" class="btn btn-pdf">📄 Relatório PDF</button>
+                    <button onclick="enviarWhatsApp()" class="btn btn-wpp">🟢 Enviar WhatsApp</button>
+                </div>
+                
+                <hr style="border: 1px solid var(--border); margin-bottom: 20px;">
+                <button id="limparHistorico" class="btn btn-outline">Limpar Todo o Histórico</button>
+            </section>
+
+            <!-- ABA 3: EQUIPA -->
+            <section id="tab-colab" class="tab-content">
+                <div class="form-group">
+                    <label>Matrícula</label>
+                    <input type="number" id="gerirMatricula" placeholder="Ex: 99999">
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="gerirNome" placeholder="Ex: JOÃO DA SILVA">
+                </div>
+                <div class="form-group">
+                    <label>Turma</label>
+                    <input type="text" id="gerirTurma" placeholder="Ex: 8">
+                </div>
+                
+                <div class="btn-group">
+                    <button id="btnAdicionarColab" class="btn btn-primary">Guardar</button>
+                    <button id="btnRemoverColab" class="btn btn-danger">Remover</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // --- REMOVER SPLASH SCREEN APÓS CARREGAMENTO ---
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.visibility = 'hidden', 500);
+            }, 1500); // Aparece por 1.5s
+        });
+
+        function openTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+            if (tabId === 'tab-historico') atualizarTabela();
+        }
+
+        const mapaLideres = {
+            "68592": "Marcos Antônio",
+            "66680": "Lázaro Edivânio",
+            "68999": "Diogo Berg"
+        };
+
+        const baseInicialColaboradores = {
+            "93482": { nome: "DIEGO MORAES SILVA", turma: "8" },
+            "71562": { nome: "FRANCIVALDO DA MATA SANTOS", turma: "9" },
+            "85640": { nome: "JOSIVALDO GONZAGA DA COSTA", turma: "89" },
+            "95882": { nome: "DIEGO RAUL ANTUNES OLIVEIRA", turma: "8" }
+        };
+
+        let colaboradores = JSON.parse(localStorage.getItem('colaboradoresAgrovale')) || baseInicialColaboradores;
+        let historicoEntregas = JSON.parse(localStorage.getItem('entregasEpiAgrovale')) || [];
+        let entregasFiltradasAtuais = []; 
+
+        if (!localStorage.getItem('colaboradoresAgrovale')) {
+            localStorage.setItem('colaboradoresAgrovale', JSON.stringify(colaboradores));
+        }
+
+        function obterDataUltimoPedido(matricula, epi, timestampAtual) {
+            const anteriores = historicoEntregas.filter(e => 
+                e.matricula === matricula && e.epi === epi && new Date(e.timestamp) < new Date(timestampAtual)
+            );
+            if (anteriores.length === 0) return "Primeira vez";
+            anteriores.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            return anteriores[0].dataCurta;
+        }
+
+        const matriculaInput = document.getElementById('matricula');
+        const nomeInput = document.getElementById('nome');
+        const warningBox = document.getElementById('warningBox');
+        const checkboxesEPI = document.querySelectorAll('input[name="epi"]');
+
+        matriculaInput.addEventListener('input', function() {
+            const mat = this.value;
+            if (colaboradores[mat]) {
+                nomeInput.value = `${colaboradores[mat].nome} (T${colaboradores[mat].turma})`;
+            } else {
+                nomeInput.value = mat.length > 0 ? '⚠️ Colaborador não encontrado' : '';
+            }
+            verificarHistoricoMultiplo();
+        });
+
+        checkboxesEPI.forEach(cb => cb.addEventListener('change', verificarHistoricoMultiplo));
+
+        function verificarHistoricoMultiplo() {
+            warningBox.innerHTML = '';
+            warningBox.style.display = 'none';
+            const mat = matriculaInput.value;
+            if (!mat || !colaboradores[mat]) return;
+
+            let avisos = [];
+            checkboxesEPI.forEach(cb => {
+                if (cb.checked) {
+                    const dataUltimo = obterDataUltimoPedido(mat, cb.value, new Date().toISOString());
+                    if (dataUltimo !== "Primeira vez") {
+                        avisos.push(`• <strong>${cb.value}</strong> retirado anteriormente em: ${dataUltimo}`);
+                    }
+                }
+            });
+
+            if (avisos.length > 0) {
+                warningBox.innerHTML = "<strong>Histórico deste colaborador:</strong><br>" + avisos.join('<br>');
+                warningBox.style.display = 'block';
+            }
+        }
+
+        document.getElementById('epiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const mat = matriculaInput.value;
+            if (!colaboradores[mat]) return alert("Matrícula inválida.");
+
+            let episSelecionados = [];
+            checkboxesEPI.forEach(cb => { if (cb.checked) episSelecionados.push(cb.value); });
+            if (episSelecionados.length === 0) return alert("Selecione pelo menos um EPI.");
+
+            const dataAtual = new Date();
+            const dataCurta = dataAtual.toLocaleDateString('pt-PT');
+            const liderID = document.getElementById('lider').value;
+            
+            episSelecionados.forEach(epiNome => {
+                historicoEntregas.push({
+                    lider: liderID,
+                    liderNome: mapaLideres[liderID] || "Desconhecido",
+                    matricula: mat,
+                    nome: colaboradores[mat].nome,
+                    turma: colaboradores[mat].turma,
+                    epi: epiNome,
+                    timestamp: dataAtual.toISOString(),
+                    dataCurta: dataCurta
+                });
+            });
+
+            localStorage.setItem('entregasEpiAgrovale', JSON.stringify(historicoEntregas));
+            alert("✅ Entrega registada com sucesso!");
+            this.reset();
+            warningBox.style.display = 'none';
+            nomeInput.value = '';
+            atualizarTabela();
+        });
+
+        function atualizarTabela() {
+            const tabelaHTML = document.getElementById('tabelaHistorico');
+            tabelaHTML.innerHTML = '';
+            
+            const fMatricula = document.getElementById('filtroMatricula').value.trim();
+            const fEpi = document.getElementById('filtroEquipamento').value;
+            
+            let filtrados = [...historicoEntregas].reverse();
+
+            if (fMatricula) filtrados = filtrados.filter(e => e.matricula.includes(fMatricula));
+            if (fEpi) filtrados = filtrados.filter(e => e.epi === fEpi);
+            
+            entregasFiltradasAtuais = filtrados; 
+
+            if (filtrados.length === 0) {
+                tabelaHTML.innerHTML = `<tr><td colspan="4" class="empty-state">Nenhum registo encontrado.</td></tr>`;
+                return;
+            }
+
+            filtrados.forEach(e => {
+                const ultimoPed = obterDataUltimoPedido(e.matricula, e.epi, e.timestamp);
+                tabelaHTML.innerHTML += `
+                    <tr>
+                        <td>${e.dataCurta}</td>
+                        <td><strong>${e.matricula}</strong><br><span style="font-size:11px;color:var(--text-muted)">${e.nome} (T${e.turma})</span></td>
+                        <td>${e.epi}</td>
+                        <td style="font-size:12px; color:var(--text-muted)">${ultimoPed}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('filtroMatricula').addEventListener('input', atualizarTabela);
+        document.getElementById('filtroEquipamento').addEventListener('change', atualizarTabela);
+
+        function exportarPDF() {
+            if (entregasFiltradasAtuais.length === 0) return alert("Não há dados para exportar.");
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.text("EMPRESA AGROVALE", 14, 15);
+            doc.setFontSize(12);
+            doc.text("Setor: Herbicida", 14, 22);
+            doc.text(`Data do Relatório: ${new Date().toLocaleDateString('pt-PT')}`, 14, 28);
+            
+            const lideresUnicos = [...new Set(entregasFiltradasAtuais.map(item => item.liderNome))].join(", ");
+            doc.text(`Líder(es) da Turma: ${lideresUnicos}`, 14, 34);
+
+            const tableData = entregasFiltradasAtuais.map(e => [
+                e.dataCurta,
+                e.turma,
+                e.matricula,
+                e.nome,
+                e.epi,
+                obterDataUltimoPedido(e.matricula, e.epi, e.timestamp)
+            ]);
+
+            doc.autoTable({
+                startY: 40,
+                head: [['Data', 'Turma', 'Matr.', 'Nome do Colaborador', 'EPI Entregue', 'Pedido Anterior']],
+                body: tableData,
+                theme: 'grid',
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [76, 175, 80] }
+            });
+
+            doc.save("Relatorio_EPI_Agrovale.pdf");
+        }
+
+        function enviarWhatsApp() {
+            if (entregasFiltradasAtuais.length === 0) return alert("Não há dados para enviar.");
+
+            const nomeLider = [...new Set(entregasFiltradasAtuais.map(item => item.liderNome))].join(", ");
+
+            let texto = `*AGROVALE - RELATÓRIO DE EPIs*%0A`;
+            texto += `*Setor:* Herbicida%0A`;
+            texto += `*Líder(es):* ${nomeLider}%0A`;
+            texto += `*Data:* ${new Date().toLocaleDateString('pt-PT')}%0A`;
+            texto += `%0A*LISTA DE ENTREGAS:*%0A`;
+
+            entregasFiltradasAtuais.forEach(e => {
+                const ultimoPed = obterDataUltimoPedido(e.matricula, e.epi, e.timestamp);
+                texto += `%0A➖ *Data:* ${e.dataCurta}`;
+                texto += `%0A👤 *Colaborador:* ${e.nome} (Mat: ${e.matricula} - Turma ${e.turma})`;
+                texto += `%0A🛠️ *EPI:* ${e.epi}`;
+                texto += `%0A🕒 *Retirada Anterior:* ${ultimoPed}%0A`;
+            });
+
+            const url = `https://wa.me/?text=${texto}`;
+            window.open(url, '_blank');
+        }
+
+        document.getElementById('btnAdicionarColab').addEventListener('click', function() {
+            const mat = document.getElementById('gerirMatricula').value.trim();
+            const nome = document.getElementById('gerirNome').value.trim().toUpperCase();
+            const turma = document.getElementById('gerirTurma').value.trim();
+            if (!mat || !nome || !turma) return alert("Preencha todos os campos.");
+            colaboradores[mat] = { nome: nome, turma: turma };
+            localStorage.setItem('colaboradoresAgrovale', JSON.stringify(colaboradores));
+            alert("✅ Colaborador guardado!");
+            document.getElementById('gerirMatricula').value = ''; document.getElementById('gerirNome').value = ''; document.getElementById('gerirTurma').value = '';
+        });
+
+        document.getElementById('btnRemoverColab').addEventListener('click', function() {
+            const mat = document.getElementById('gerirMatricula').value.trim();
+            if (colaboradores[mat] && confirm(`Remover ${colaboradores[mat].nome}?`)) {
+                delete colaboradores[mat];
+                localStorage.setItem('colaboradoresAgrovale', JSON.stringify(colaboradores));
+                alert("🗑️ Colaborador removido.");
+                document.getElementById('gerirMatricula').value = '';
+            }
+        });
+
+        document.getElementById('limparHistorico').addEventListener('click', function() {
+            if(confirm("ATENÇÃO: Deseja eliminar TODO o histórico de entregas local?")) {
+                localStorage.removeItem('entregasEpiAgrovale');
+                historicoEntregas = [];
+                atualizarTabela();
+            }
+        });
+
+        atualizarTabela();
+    </script>
+</body>
+</html>
