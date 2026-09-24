@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de EPIs Agrovale</title>
     
-    <!-- Ícone da Aplicação (Favicon e Apple Touch Icon) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
 
@@ -37,7 +36,6 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--bg-body); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
         
-        /* --- SPLASH SCREEN --- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--bg-body); z-index: 9999;
@@ -46,19 +44,10 @@
         }
         
         .splash-icon svg { width: 80px; height: 80px; fill: #4CAF50; margin-bottom: 20px; }
-        
-        #splash-screen h1 {
-            color: #ffffff; font-size: 26px; font-weight: 700; margin-bottom: 30px; letter-spacing: 0.5px;
-        }
-
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid var(--border);
-            border-top-color: #4CAF50; border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        #splash-screen h1 { color: #ffffff; font-size: 26px; font-weight: 700; margin-bottom: 30px; letter-spacing: 0.5px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- APP CONTAINER --- */
         .app-container {
             background-color: var(--bg-card); width: 100%; max-width: 700px;
             border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
@@ -92,7 +81,7 @@
         }
         input::placeholder { color: #6b7280; }
         input:focus, select:focus { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2); }
-        input[readonly] { background-color: #1f2937; color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border); }
+        input[readonly] { background-color: #1f2937; color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border); font-weight: 500; }
 
         .epi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; max-height: 260px; overflow-y: auto; padding-right: 5px; }
         .epi-grid::-webkit-scrollbar { width: 6px; }
@@ -133,10 +122,8 @@
 </head>
 <body>
 
-    <!-- ECRÃ INICIAL (SPLASH SCREEN) -->
     <div id="splash-screen">
         <div class="splash-icon">
-            <!-- Ícone de Escudo SVG -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
             </svg>
@@ -145,7 +132,6 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- APLICAÇÃO -->
     <div class="app-container">
         <header class="header">
             <h1>Gestão de EPIs</h1>
@@ -200,7 +186,7 @@
                     </div>
 
                     <div class="warning-box" id="warningBox"></div>
-                    <button type="submit" class="btn btn-primary">✓ Confirmar Entrega</button>
+                    <button type="submit" class="btn btn-primary" id="btnGravar">✓ Confirmar Entrega</button>
                 </form>
             </section>
 
@@ -273,13 +259,12 @@
     </div>
 
     <script>
-        // --- REMOVER SPLASH SCREEN APÓS CARREGAMENTO ---
         window.addEventListener('load', function() {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
                 setTimeout(() => splash.style.visibility = 'hidden', 500);
-            }, 1500); // Aparece por 1.5s
+            }, 1500); 
         });
 
         function openTab(tabId, element) {
@@ -291,9 +276,9 @@
         }
 
         const mapaLideres = {
-            "68592": "Marcos Antônio",
-            "66680": "Lázaro Edivânio",
-            "68999": "Diogo Berg"
+            "68592": { nome: "Marcos Antônio", turma: "8" },
+            "66680": { nome: "Lázaro Edivânio", turma: "9" },
+            "68999": { nome: "Diogo Berg", turma: "89" }
         };
 
         const baseInicialColaboradores = {
@@ -320,19 +305,46 @@
             return anteriores[0].dataCurta;
         }
 
+        const liderSelect = document.getElementById('lider');
         const matriculaInput = document.getElementById('matricula');
         const nomeInput = document.getElementById('nome');
         const warningBox = document.getElementById('warningBox');
         const checkboxesEPI = document.querySelectorAll('input[name="epi"]');
 
-        matriculaInput.addEventListener('input', function() {
-            const mat = this.value;
-            if (colaboradores[mat]) {
-                nomeInput.value = `${colaboradores[mat].nome} (T${colaboradores[mat].turma})`;
-            } else {
-                nomeInput.value = mat.length > 0 ? '⚠️ Colaborador não encontrado' : '';
+        function validarMatriculaETurma() {
+            const mat = matriculaInput.value;
+            const liderId = liderSelect.value;
+            
+            nomeInput.style.color = "var(--text-main)";
+            
+            if (mat.length === 0) {
+                nomeInput.value = '';
+                return false;
             }
+
+            if (!colaboradores[mat]) {
+                nomeInput.value = '⚠️ Colaborador não encontrado';
+                nomeInput.style.color = "var(--danger)";
+                return false;
+            }
+
+            if (liderId && mapaLideres[liderId].turma !== colaboradores[mat].turma) {
+                nomeInput.value = `⚠️ Incorreto: Colaborador é da Turma ${colaboradores[mat].turma}`;
+                nomeInput.style.color = "var(--danger)";
+                return false;
+            }
+
+            nomeInput.value = `${colaboradores[mat].nome} (T${colaboradores[mat].turma})`;
+            return true;
+        }
+
+        matriculaInput.addEventListener('input', () => {
+            validarMatriculaETurma();
             verificarHistoricoMultiplo();
+        });
+
+        liderSelect.addEventListener('change', () => {
+            validarMatriculaETurma();
         });
 
         checkboxesEPI.forEach(cb => cb.addEventListener('change', verificarHistoricoMultiplo));
@@ -341,14 +353,15 @@
             warningBox.innerHTML = '';
             warningBox.style.display = 'none';
             const mat = matriculaInput.value;
-            if (!mat || !colaboradores[mat]) return;
+            
+            if (!validarMatriculaETurma()) return;
 
             let avisos = [];
             checkboxesEPI.forEach(cb => {
                 if (cb.checked) {
                     const dataUltimo = obterDataUltimoPedido(mat, cb.value, new Date().toISOString());
                     if (dataUltimo !== "Primeira vez") {
-                        avisos.push(`• <strong>${cb.value}</strong> retirado anteriormente em: ${dataUltimo}`);
+                        avisos.push(`• <strong>${cb.value}</strong> retirado em: ${dataUltimo}`);
                     }
                 }
             });
@@ -361,8 +374,15 @@
 
         document.getElementById('epiForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             const mat = matriculaInput.value;
+            const liderID = liderSelect.value;
+
             if (!colaboradores[mat]) return alert("Matrícula inválida.");
+            
+            if (mapaLideres[liderID].turma !== colaboradores[mat].turma) {
+                return alert(`Operação Bloqueada!\n\nO colaborador pertence à Turma ${colaboradores[mat].turma}.\nEste registo só pode ser feito pelo líder dessa turma.`);
+            }
 
             let episSelecionados = [];
             checkboxesEPI.forEach(cb => { if (cb.checked) episSelecionados.push(cb.value); });
@@ -370,12 +390,11 @@
 
             const dataAtual = new Date();
             const dataCurta = dataAtual.toLocaleDateString('pt-PT');
-            const liderID = document.getElementById('lider').value;
             
             episSelecionados.forEach(epiNome => {
                 historicoEntregas.push({
                     lider: liderID,
-                    liderNome: mapaLideres[liderID] || "Desconhecido",
+                    liderNome: mapaLideres[liderID].nome,
                     matricula: mat,
                     nome: colaboradores[mat].nome,
                     turma: colaboradores[mat].turma,
