@@ -279,12 +279,46 @@
             "95882": { nome: "DIEGO RAUL ANTUNES OLIVEIRA", turma: "8" }
         };
 
-        // --- GESTÃO DE EPIs DINÂMICOS ---
+        // --- GESTÃO DE EPIs DINÂMICOS (Atualizado via Documento PDF) ---
         const epiPadrao = [
-            "Calça hidrorrepelente", "Jaleco hidrorrepelente", "Avental impermeável (PVC)",
-            "Botas de borracha/PVC", "Luvas nitrílica/neoprene", "Respirador com filtro",
-            "Viseira facial protetora", "Boné ou touca árabe", "Luva MAPA",
-            "Máscara descartável", "Calça Jeans", "Camisa manga longa/curta", "Bota de Couro"
+            "Boné Brim Cinza",
+            "Boné Azul",
+            "Boné Rural",
+            "Tela Facial",
+            "Óculos Seg. Industr. Uvex Cinza",
+            "Óculos Lente Transparente",
+            "Luva Couro c/ Reforço Cano Longo",
+            "Luva Vaqueta c/ Raspa Cano 20cm",
+            "Luva Previlon",
+            "Luva Nitrílica",
+            "Luva PVC 36cm",
+            "Capa de Chuva",
+            "Protetor Concha",
+            "Luva Vaqueta",
+            "Short",
+            "Camisa Jaleco",
+            "Camisa Helanca",
+            "Calça Helanca",
+            "Luva Motoqueiro",
+            "Kit Aplicação",
+            "Máscara Descartável",
+            "Respirador Semi-Facial Moldex",
+            "Cartucho Vapor Orgânico Moldex",
+            "Filtro Mecânico P2 Moldex",
+            "Retentor Pré-Filtro Moldex",
+            "Garrafa 5L",
+            "Marmita",
+            "Enxada",
+            "Cabo de Enxada",
+            "Porta Lima",
+            "Lima",
+            "Calça Brim Industrial Cinza Claro",
+            "Camisa Brim Manga Longa Cinza Claro",
+            "Calça Jeans Mod. Masculino",
+            "Camisa Sempre Igual Azul",
+            "Bota Couro Preta S/ Cadarço S/ Biqueira",
+            "Bota Couro Preta S/ Cadarço C/ Biqueira",
+            "Bota PVC"
         ];
         
         let episAdicionados = JSON.parse(localStorage.getItem('episAdicionadosAgrovale')) || [];
@@ -326,7 +360,6 @@
             });
         }
 
-        // --- ADICIONAR NOVO EPI ---
         document.getElementById('btnAdicionarEpi').addEventListener('click', function() {
             const novoEpi = document.getElementById('novoEpiNome').value.trim();
             if (!novoEpi) return alert("Digite o nome do EPI antes de adicionar.");
@@ -452,7 +485,7 @@
             alert("✅ Entrega registada com sucesso!");
             
             this.reset();
-            document.querySelectorAll('input[name="epi"]').forEach(cb => cb.checked = false); // Limpa as caixas de seleção
+            document.querySelectorAll('input[name="epi"]').forEach(cb => cb.checked = false);
             warningBox.style.display = 'none';
             nomeInput.value = '';
             atualizarTabela();
