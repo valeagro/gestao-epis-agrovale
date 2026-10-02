@@ -1,15 +1,15 @@
 {
   "name": "Gestão de EPIs Agrovale",
   "short_name": "EPIs Agrovale",
-  "description": "Controlo de entrega de equipamentos de proteção individual",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#4CAF50",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%231F2937' d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z'/><path fill='%234CAF50' d='M12 3l7.5 3.3v5.2c0 4.2-2.6 8-7.5 9.3-4.9-1.3-7.5-5.1-7.5-9.3V6.3L12 3m0-2L2 5v6c0 5.5 3.8 10.7 10 12 6.2-1.3 10-6.5 10-12V5L12 1z'/><path fill='%23F59E0B' d='M12 7c-2.8 0-5 2.2-5 5v1h10v-1c0-2.8-2.2-5-5-5zm-5 7h10v1H7v-1z'/><path fill='%2310B981' d='M10 17l-3-3 1.4-1.4 1.6 1.6 4.6-4.6L16 11l-6 6z'/></svg>",
-      "sizes": "192x192 512x512",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzRDQUY1MCI+PHBhdGggZD0iTTEyIDFMMyA1djZjMCA1LjU1IDMuODQgMTAuNzQgOSAxMiA1LjE2LTEuMjYgOS02LjQ1IDktMTJWNWwtOS00em0tMiAxNmwtNC00IDEuNDEtMS40MUwxMCAxNC4xN2w2LjU5LTYuNTlMMTggOWwtOCA4eiIvPjwvc3ZnPg==",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
