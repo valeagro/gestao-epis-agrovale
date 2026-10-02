@@ -1,11 +1,10 @@
-const CACHE_NAME = 'epi-agrovale-v1';
+const CACHE_NAME = 'epi-agrovale-v2';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Instala o motor offline
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -13,9 +12,24 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting(); // Força o novo SW a ativar imediatamente
 });
 
-// Interceta os pedidos de internet e serve os ficheiros guardados no telemóvel
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName); // Apaga a versão antiga
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
